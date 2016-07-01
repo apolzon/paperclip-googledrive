@@ -54,7 +54,7 @@ module Paperclip
             #upload(style, file) #style file
             client = google_drive_client
             title, mime_type = title_for_file(style), "#{content_type}"
-            parent_id = @google_drive_options[:public_folder_id] # folder_id for Public folder
+            parent_id = find_public_folder
             metadata = {
               :name => title, #if it is no extension, that is a folder and another folder
               :description => 'paperclip file on google drive',
@@ -137,8 +137,9 @@ module Paperclip
       # take title, search in given folder and if it finds a file, return id of a file or nil
       def search_for_title(title)
         client = google_drive_client
+        parent_id = find_public_folder
         result = client.list_files(
-          q: "'#{@google_drive_options[:public_folder_id]}' in parents and name = '#{title}'",
+          q: "'#{parent_id}' in parents and name = '#{title}'",
           fields: 'files(id)'
         ).to_h
         if result[:files].length > 0
@@ -186,7 +187,11 @@ module Paperclip
         unless @google_drive_options[:public_folder_id]
           raise KeyError, "you must set a Public folder if into options"
         end
-        @google_drive_options[:public_folder_id]
+        if @google_drive_options[:public_folder_id].is_a? Proc
+          instance.instance_exec(&@google_drive_options[:public_folder_id])
+        else
+          @google_drive_options[:public_folder_id]
+        end
       end
 
       class FileExists < ArgumentError
