@@ -216,7 +216,7 @@ module Paperclip
         end
 
         def path_options
-          @options[:path].respond_to?(:call) ? @options[:path].call(self) : @options[:path]
+          @options[:path].respond_to?(:call) ? instance.instance_exec(&@options[:path]) : @options[:path]
         end
 
         # return extension of file
