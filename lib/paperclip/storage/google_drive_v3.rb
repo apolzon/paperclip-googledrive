@@ -220,6 +220,7 @@ module Paperclip
         end
 
         def set_public_folder_id(client)
+          return if @google_drive_options[:public_folder_id]
           response = client.list_files(
               q: "name = '#{@google_drive_options[:public_folder]}'",
               fields: 'files(id)'
@@ -231,8 +232,9 @@ module Paperclip
             }
             file = client.create_file(file_metadata, fields: 'id')
             @google_drive_options[:public_folder_id] = file.id
+          else
+            @google_drive_options[:public_folder_id] = response.files.first.id
           end
-          @google_drive_options[:public_folder_id] = response.files.first.id
         end
 
         def get_token_store
