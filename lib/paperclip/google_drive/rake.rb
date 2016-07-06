@@ -56,8 +56,11 @@ module Paperclip
         token_store = Google::Auth::Stores::FileTokenStore.new(
           file: Paperclip::Storage::GoogleDriveV3::CREDENTIALS_PATH
         )
+        puts "Enter any additional scopes: scope1,scope2"
+        additional_scopes_string = $stdin.gets.chomp.strip
+        scopes = Paperclip::Storage::GoogleDriveV3::SCOPES.concat(additional_scopes_string.split(","))
         authorizer = Google::Auth::UserAuthorizer.new(
-          client_id, Paperclip::Storage::GoogleDriveV3::SCOPES, token_store)
+          client_id, scopes, token_store)
         credentials = authorizer.get_credentials('default')
         if credentials.nil?
           url = authorizer.get_authorization_url(
