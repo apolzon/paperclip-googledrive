@@ -27,8 +27,6 @@ module Paperclip
 
       OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
       SCOPES = [Google::Apis::DriveV3::AUTH_DRIVE_FILE, Google::Apis::DriveV3::AUTH_DRIVE_APPDATA]
-      CREDENTIALS_PATH = File.join(Dir.home, '.credentials',
-                                   "drive-ruby-quickstart.yaml")
 
       def self.extended(base)
         begin
@@ -246,11 +244,11 @@ module Paperclip
           if @google_drive_options[:token_store].respond_to?('call')
              token_store = @google_drive_options[:token_store].call(self)
              unless token_store.is_a? Google::Auth::TokenStore
-               token_store = Google::Auth::Stores::FileTokenStore.new(file: CREDENTIALS_PATH)
+               token_store = Google::Auth::Stores::RedisTokenStore.new(redis: Redis.new)
              end
              token_store
            else
-             Google::Auth::Stores::FileTokenStore.new(file: CREDENTIALS_PATH)
+             Google::Auth::Stores::RedisTokenStore.new(redis: Redis.new)
            end
         end
     end

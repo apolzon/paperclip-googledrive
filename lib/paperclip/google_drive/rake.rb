@@ -1,4 +1,4 @@
-
+require 'googleauth/stores/redis_token_store'
 require 'google/apis/drive_v2'
 
 module Paperclip
@@ -53,8 +53,8 @@ module Paperclip
         end
         client_secrets_keys_hash = YAML.load_file(Rails.application.config.paperclip_defaults[:client_secrets_path])
         client_id = Google::Auth::ClientId.from_hash(client_secrets_keys_hash)
-        token_store = Google::Auth::Stores::FileTokenStore.new(
-          file: Paperclip::Storage::GoogleDriveV3::CREDENTIALS_PATH
+        token_store = Google::Auth::Stores::RedisTokenStore.new(
+          redis: Redis.new
         )
         puts "Enter any additional scopes: scope1,scope2"
         additional_scopes_string = $stdin.gets.chomp.strip
