@@ -47,11 +47,13 @@ module Paperclip
       end
 
       def authorizeV3
-        if Rails.application.config.paperclip_defaults[:client_secrets_path].nil?
-          puts "You need to specify a `client_secrets_path` in paperclip config"
+        client_secrets_path = Rails.application.config.paperclip_defaults[:client_secrets_path]
+        client_secrets_keys_hash = Rails.application.config.paperclip_defaults[:client_secrets_hash]
+        if client_secrets_path.nil? && client_secrets_keys_hash.nil?
+          puts "You need to specify a `client_secrets_path` or `client_secrets_hash` in paperclip config"
           return
         end
-        client_secrets_keys_hash = YAML.load_file(Rails.application.config.paperclip_defaults[:client_secrets_path])
+        client_secrets_keys_hash ||= YAML.load_file(Rails.application.config.paperclip_defaults[:client_secrets_path])
         client_id = Google::Auth::ClientId.from_hash(client_secrets_keys_hash)
         token_store = Google::Auth::Stores::RedisTokenStore.new(
           redis: Redis.new

@@ -37,8 +37,8 @@ module Paperclip
         end unless defined?(Google)
 
         base.instance_eval do
-          # @google_drive_credentials = parse_credentials(@options[:CLIENT_SECRETS_PATH] || {})
           @client_secrets_path = @options[:google_drive_credentials]
+          @client_secrets_keys_hash = @options[:client_secrets_hash]
           @google_drive_options = @options[:google_drive_options] || {}
           google_drive_client # Force validations of credentials
         end
@@ -201,8 +201,8 @@ module Paperclip
       private
 
         def authorize
-          client_secrets_keys_hash = YAML.load_file(@client_secrets_path)
-          client_id = Google::Auth::ClientId.from_hash(client_secrets_keys_hash)
+          @client_secrets_keys_hash ||= YAML.load_file(@client_secrets_path)
+          client_id = Google::Auth::ClientId.from_hash(@client_secrets_keys_hash)
           token_store = get_token_store
           authorizer = Google::Auth::UserAuthorizer.new(
             client_id, SCOPES, token_store)
