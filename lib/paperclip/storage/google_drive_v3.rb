@@ -66,6 +66,13 @@ module Paperclip
               fields: 'id, name',
               upload_source: file.binmode
             )
+
+            field_name = :"#{@name_string}_drive_id"
+            setter = :"#{field_name}="
+            if instance.respond_to?(setter)
+              instance.update_column(field_name, result.id)
+            end
+
             callback = lambda do |res, err|
               if err
                 # Handle error...
@@ -89,6 +96,12 @@ module Paperclip
           unless file_id.nil?
             folder_id = find_public_folder
             client.delete_file(file_id)
+
+            field_name = :"#{@name_string}_drive_id"
+            setter = :"#{field_name}="
+            if instance.respond_to?(setter)
+              instance.update_column(field_name, nil)
+            end
           end
         end
         @queued_for_delete = []
@@ -128,12 +141,14 @@ module Paperclip
         if searched_id.nil? # it finds some file
           default_image
         else
-          metadata = metadata_by_id(searched_id)
-          metadata[:web_content_link]
+          "https://docs.google.com/uc?id=#{searched_id}&export=download"
         end
       end # url
       # take title, search in given folder and if it finds a file, return id of a file or nil
       def search_for_title(title)
+        drive_id = instance_read(:drive_id)
+        return drive_id if drive_id
+
         client = google_drive_client
         parent_id = find_public_folder
         result = client.list_files(
