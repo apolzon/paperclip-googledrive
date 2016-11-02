@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 2.0.0"
   gem.license       = "MIT"
 
-  gem.add_dependency "paperclip", "~> 4.3.5"
+  gem.add_dependency "paperclip", "~> 5.0"
   gem.add_dependency 'google-api-client', "~> 0.9"
 
   gem.add_development_dependency "rake", ">= 0.9"
