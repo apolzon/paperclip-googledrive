@@ -99,7 +99,7 @@ module Paperclip
 
             field_name = :"#{@name_string}_drive_id"
             setter = :"#{field_name}="
-            if instance.respond_to?(setter)
+            if !instance.destroyed? && instance.respond_to?(setter)
               instance.update_column(field_name, nil)
             end
           end
